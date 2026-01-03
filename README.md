@@ -2,8 +2,6 @@
 
 A responsive weather application with location-based forecasts, interactive maps, and detailed weather analytics.
 
-![Weather Dashboard](./public/weather-icon.svg)
-
 ## Features
 
 -   **Location-based Forecasts** - Automatic weather detection using geolocation
