@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 
-// Using OpenWeatherMap API - Users should replace with their own API key
-const API_KEY = "3968f6fc97692f73742601715a4c6817";
+const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 // Transform the 5-day/3-hour forecast to hourly and daily format
@@ -78,6 +77,8 @@ export function useWeather() {
         setError(null);
 
         try {
+            console.log(`Fetching weather for city: ${city}`);
+
             // Fetch current weather
             const weatherRes = await fetch(
                 `${BASE_URL}/weather?q=${encodeURIComponent(
@@ -87,13 +88,22 @@ export function useWeather() {
 
             if (!weatherRes.ok) {
                 const errorData = await weatherRes.json();
+                console.error("Weather API Error:", errorData);
+
+                // Handle specific error codes
+                if (errorData.cod === 401) {
+                    throw new Error(
+                        "API key not activated yet. Please wait up to 2 hours after creating your API key."
+                    );
+                }
                 throw new Error(errorData.message || "City not found");
             }
 
             const weatherData = await weatherRes.json();
+            console.log("Weather data received:", weatherData);
             setWeather(weatherData);
 
-            // Fetch 5-day forecast (free API)
+            // Fetch 5-day forecast
             const forecastRes = await fetch(
                 `${BASE_URL}/forecast?q=${encodeURIComponent(
                     city
@@ -102,15 +112,18 @@ export function useWeather() {
 
             if (forecastRes.ok) {
                 const forecastData = await forecastRes.json();
+                console.log("Forecast data received");
                 const transformedForecast = transformForecastData(
                     forecastData.list
                 );
                 setForecast(transformedForecast);
             } else {
+                console.warn("Forecast fetch failed, using minimal forecast");
                 // Set minimal forecast if fetch fails
                 setForecast({ hourly: [], daily: [] });
             }
         } catch (err) {
+            console.error("Error fetching weather:", err);
             setError(err.message || "Failed to fetch weather data");
             setWeather(null);
             setForecast(null);
@@ -124,6 +137,8 @@ export function useWeather() {
         setError(null);
 
         try {
+            console.log(`Fetching weather for coordinates: ${lat}, ${lon}`);
+
             // Fetch current weather
             const weatherRes = await fetch(
                 `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
@@ -131,6 +146,13 @@ export function useWeather() {
 
             if (!weatherRes.ok) {
                 const errorData = await weatherRes.json();
+                console.error("Weather API Error:", errorData);
+
+                if (errorData.cod === 401) {
+                    throw new Error(
+                        "API key not activated yet. Please wait up to 2 hours after creating your API key."
+                    );
+                }
                 throw new Error(
                     errorData.message ||
                         "Unable to fetch weather for this location"
@@ -138,23 +160,27 @@ export function useWeather() {
             }
 
             const weatherData = await weatherRes.json();
+            console.log("Weather data received:", weatherData);
             setWeather(weatherData);
 
-            // Fetch 5-day forecast (free API)
+            // Fetch 5-day forecast
             const forecastRes = await fetch(
                 `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
             );
 
             if (forecastRes.ok) {
                 const forecastData = await forecastRes.json();
+                console.log("Forecast data received");
                 const transformedForecast = transformForecastData(
                     forecastData.list
                 );
                 setForecast(transformedForecast);
             } else {
+                console.warn("Forecast fetch failed, using minimal forecast");
                 setForecast({ hourly: [], daily: [] });
             }
         } catch (err) {
+            console.error("Error fetching weather:", err);
             setError(err.message || "Failed to fetch weather data");
             setWeather(null);
             setForecast(null);

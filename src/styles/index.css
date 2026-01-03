@@ -1052,6 +1052,23 @@ body {
   font-size: 1.1rem;
 }
 
+.info-message {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.875rem 1.25rem;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  border-radius: var(--radius-lg);
+  color: #7dd3fc;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.info-icon {
+  font-size: 1.1rem;
+}
+
 /* Welcome Message */
 .welcome-message {
   display: flex;

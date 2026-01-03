@@ -30,6 +30,7 @@ function App() {
     // Fetch weather on location change
     useEffect(() => {
         if (coords) {
+            console.log("Coordinates received, fetching weather:", coords);
             fetchWeatherByCoords(coords.lat, coords.lon);
         }
     }, [coords]);
@@ -45,6 +46,7 @@ function App() {
     };
 
     const handleLocationRequest = () => {
+        console.log("Location button clicked");
         requestLocation();
     };
 
@@ -72,10 +74,21 @@ function App() {
                     </div>
                 )}
 
-                {loading && !weather && (
+                {geoError && !loading && !weather && (
+                    <div className="info-message">
+                        <span className="info-icon">ℹ️</span>
+                        {geoError}
+                    </div>
+                )}
+
+                {(loading || geoLoading) && (
                     <div className="loading-container">
                         <div className="loading-spinner"></div>
-                        <p>Fetching weather data...</p>
+                        <p>
+                            {geoLoading
+                                ? "Getting your location..."
+                                : "Fetching weather data..."}
+                        </p>
                     </div>
                 )}
 
